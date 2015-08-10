@@ -2,7 +2,7 @@
  * 'Game' logic
  */
 
-(function() {
+(function(settings) {
   var canvas = document.getElementById('myCanvas');
 
   function makeCanvasFullPage() {
@@ -24,41 +24,37 @@
     return canvas.height / 2;
   }
 
-  var populars = {};
+  var balls = [], hashtagBalls = {};
 
-  // these are the colors that will be used by the balls
-  var colors = ['aqua', 'yellow', 'blue', 'fuchsia', 'green',
-    'lime', 'maroon', 'navy', 'olive', 'orange', 'purple', 'red',
-    'silver', 'teal', 'white', 'gray'];
+  function getHashtagBall(hashtag) {
+    var hashtagBall = hashtagBalls[hashtag];
 
-  var balls = [];
+    if (!hashtagBall) {
+      var num_hashtags = Object.keys(hashtagBalls).length,
+        color = settings.BALL_COLORS[num_hashtags % settings.BALL_COLORS.length];
 
-  function getPopular(hashtag) {
-    var popular = populars[hashtag];
-
-    if (!popular) {
-      var num_hashtags = Object.keys(populars).length,
-        color = colors[num_hashtags % colors.length];
-
-      popular = populars[hashtag] = new Ball(color, centerX(), centerY(), hashtag);
-      changePopularsDestination();
+      hashtagBall = hashtagBalls[hashtag] = new Ball(color, centerX(), centerY(), hashtag);
+      changeHashtagBallsDestination();
     }
 
-    return popular;
+    return hashtagBall;
   }
 
-  function getPopulars() {
-    return Object.keys(populars).map(function (key) {
-      return populars[key];
+  function getHashtagBalls() {
+    return Object.keys(hashtagBalls).map(function (key) {
+      return hashtagBalls[key];
     });
   }
 
-  function changePopularsDestination() {
-    var populars = getPopulars(),
-      num = populars.length;
+  function changeHashtagBallsDestination() {
+    /**
+     * Spread HashtagBalls over an oval shape
+     */
+    var hashtags = getHashtagBalls(),
+      num = hashtags.length;
 
-    populars.forEach(function (popular, index) {
-      popular.destination = new Vector2D(
+    hashtags.forEach(function (hashtagBall, index) {
+      hashtagBall.destination = new Vector2D(
         centerX() + Math.cos(index / num * Math.PI * 2) * centerX() / 1.5,
         centerY() + Math.sin(index / num * Math.PI * 2) * centerY() / 1.5
       );
@@ -66,9 +62,9 @@
 
   }
 
-  function spawnBall(destination) {
-    var popular = getPopular(destination);
-    balls.push(new Ball(popular.color, centerX(), centerY(), popular));
+  function spawnBall(hashtag) {
+    var hashtagBall = getHashtagBall(hashtag);
+    balls.push(new Ball(hashtagBall.color, centerX(), centerY(), hashtagBall));
   }
 
   function loop() {
@@ -79,18 +75,18 @@
 
   function loopBody() {
     /*
-        The actualy loop.
+        The actual loop.
         Some optimization could be performed,
         but let's keep it simple.
      */
 
-    var populars = getPopulars();
+    var hashtagBalls = getHashtagBalls();
 
     // calculate balls' next position
     balls = balls.filter(function (ball) {
       return ball.move();
     });
-    populars.forEach(function (ball) {
+    hashtagBalls.forEach(function (ball) {
       ball.move();
     });
 
@@ -99,7 +95,7 @@
     balls.forEach(function (ball) {
       ball.draw(context);
     });
-    populars.forEach(function (ball) {
+    hashtagBalls.forEach(function (ball) {
       ball.draw(context);
     });
   }
@@ -112,4 +108,4 @@
   window.Game =  {
     spawnBall: spawnBall
   };
-})();
+})(t2bsettings);

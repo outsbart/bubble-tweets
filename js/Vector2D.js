@@ -1,5 +1,5 @@
-/*
-  A pretty basic Vector2D class
+/**
+ * A pretty basic Vector2D class
  */
 
 function Vector2D(x, y) {
