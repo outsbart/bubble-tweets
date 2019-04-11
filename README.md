@@ -1,4 +1,4 @@
-Tweets to balls
+Bubble tweets
 ===============
 
 A simple, funny way to visualize tweets in a canvas using plain Javascript and PubNub's SDK.
