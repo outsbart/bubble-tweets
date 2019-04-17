@@ -1,18 +1,17 @@
 /**
  * Sends all the tweets to the game using PUBNUB's SDK.
  */
-(function(PUBNUB, Game, settings) {
-  PUBNUB.init({
-    subscribe_key: settings.PUBNUB_SUBSCRIBE_KEY
-  }).subscribe({
-    channel : settings.PUBNUB_CHANNEL,
-    message : function(msg){
-      var hashtags = msg.entities.hashtags;
-
-      // only spawn a ball if the tweet has at least one hashtag
-      if (hashtags.length) {
-        Game.spawnBall('#' + hashtags[0].text);
-      }
-    }
-  });
-})(PUBNUB, Game, t2bsettings);
+var pubnub = new PubNub({
+  subscribe_key: t2bsettings.PUBNUB_SUBSCRIBE_KEY
+});
+pubnub.addListener({
+  message: function(message) {
+    var hashtags = message.message.entities.hashtags;
+    hashtags.forEach(function(hashtag) {
+      Game.spawnBall('#' + hashtags[0].text);
+    });
+  }
+});
+pubnub.subscribe({
+  channels: ['pubnub-twitter']
+});
